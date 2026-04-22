@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Format check
+      run: dotnet format --verify-no-changes
+
+    - name: Build Debug
+      run: dotnet build -c Debug --no-restore
+
+    - name: Build Release
+      run: dotnet build -c Release --no-restore
+
+    - name: Run Tests
+      run: dotnet test --no-build
+
+    - name: Install Doxygen
+      run: sudo apt-get install doxygen -y
+
+    - name: Generate Docs
+      run: doxygen
